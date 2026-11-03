@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendlipöp Plüsseii - Horgolási Napló & Mintatervező</title>
+    <!-- Betűtípusok -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #FAF5EF;
+            --card-bg: #FFFFFF;
+            --accent: #E59885;
+            --accent-hover: #D88370;
+            --text-dark: #4A3E3D;
+            --text-muted: #9E8C8A;
+            --border-light: #F0E6DF;
+            --card-sub: #FAF6F2;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 25px;
+        }
+
+        @media (max-width: 950px) {
+            .app-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .app-logo {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: #FFF;
+            padding: 3px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-light);
+        }
+
+        .logo-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .logo-subtitle {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 6px;
+        }
+
+        .lang-select {
+            padding: 10px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border-light);
+            background: white;
+            font-family: inherit;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: rgba(229, 152, 133, 0.15);
+            padding: 6px;
+            border-radius: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: transparent;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-light);
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: var(--text-dark);
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .grand-total-card {
+            background: var(--card-sub);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            padding: 22px 28px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grand-total-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .progress-bar-bg {
+            background: var(--border-light);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+            width: 260px;
+        }
+
+        .progress-bar-fill {
+            background: var(--accent);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 15px;
+            background: #FFFFFF;
+            color: var(--text-dark);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { background-color: var(--accent-hover); }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .btn-secondary:hover { background: rgba(229, 152, 133, 0.08); }
+
+        .btn-danger-solid {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-danger-solid:hover { background: #c9302c; }
+
+        .btn-edit-solid {
+            background: #f0ad4e;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-edit-solid:hover { background: #ec971f; }
+
+        .result-card {
+            background: var(--card-sub);
+            border-radius: 20px;
+            padding: 22px 25px;
+            margin-bottom: 25px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .result-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 34px;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #FFFFFF;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+        }
+
+        .dictionary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .dict-card {
+            background: var(--card-sub);
+            padding: 16px 20px;
+            border-radius: 16px;
+        }
+
+        .dict-title {
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .dict-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .timer-display {
+            font-family: 'Playfair Display', serif;
+            font-size: 52px;
+            text-align: center;
+            color: var(--text-dark);
+            margin: 10px 0 25px 0;
+        }
+
+        .sidebar-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-light);
+            position: sticky;
+            top: 30px;
+        }
+
+        .pattern-row-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-sub);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-light);
+        }
+        .pattern-row-item.part-header {
+            background: var(--accent);
+            color: white;
+            font-weight: bold;
+        }
+        .pattern-row-item.note-item {
+            background: #fff8e7;
+            font-style: italic;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .checked-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .saved-pattern-card {
+            background: var(--card-sub);
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .saved-pattern-card.active-pattern {
+            border: 2px solid var(--accent);
+            background: rgba(229, 152, 133, 0.12);
+            box-shadow: 0 4px 12px rgba(229, 152, 133, 0.15);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .status-planned { background: #f0ad4e; }
+        .status-progress { background: #0275d8; }
+        .status-done { background: #5cb85c; }
+        .status-ordered { background: #d9534f; }
+
+        .photo-preview {
+            width: 100%;
+            max-height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid var(--border-light);
+        }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .app-wrapper { display: block; }
+            .sidebar-card { display: none !important; }
+            .tab-nav, .top-bar, .btn, button, #save-status, input, textarea, select { display: none !important; }
+            .tab-content { display: block !important; }
+            .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        
+        <div class="main-content">
+            
+            <div class="top-bar">
+                <div class="header-brand">
+                    <img src="logo.png" alt="Pendlipöp Plüsseii Logo" class="app-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h1 class="logo-title">Pendlipöp</h1>
+                        <div class="logo-subtitle" id="t-subtitle">HORGOLÁSI NAPLÓ & MINTATERVEZŐ</div>
+                    </div>
+                </div>
+                <select class="lang-select" id="lang-select" onchange="changeLanguage()">
+                    <option value="hu">🇭🇺 HU Magyar</option>
+                    <option value="en">🇺🇸 EN English</option>
+                    <option value="pl">🇵🇱 PL Polski</option>
+                </select>
+            </div>
+
+            <div class="tab-nav">
+                <button class="tab-btn active" id="t-tab1" onclick="switchTab('work-tab', event)">🧶 1. MUNKATERÜLET</button>
+                <button class="tab-btn" id="t-tab2" onclick="switchTab('design-tab', event)">✏️ 2. TERVEZŐ</button>
+                <button class="tab-btn" id="t-tab3" onclick="switchTab('product-tab', event)">📊 3. TERMÉK & PROJEKT</button>
+            </div>
+
+            <!-- 1. LAP: MUNKATERÜLET -->
+            <div id="work-tab" class="tab-content active">
+                <div class="grand-total-card">
+                    <div>
+                        <span class="section-label" id="t-overall-progress-lbl">A PLÜSS TELJES HALADÁSA</span>
+                        <div style="font-weight: 700;" id="work-progress-text">Kész: 0 / Összesen: 0 szem (0%)</div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="grand-total-number" id="work-total-display">0 szem</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <span class="section-label" id="t-timer-section-lbl">IDŐNYILVÁNTARTÁS</span>
+                    <h2 class="card-title">⏱️ <span id="t-timer-title">Munkaidő Stopper</span></h2>
+                    <div class="timer-display" id="timer">00:00</div>
+                    <div style="display: flex; justify-content: center; gap: 12px;">
+                        <button class="btn" id="t-btn-start" onclick="startTimer()">Indítás</button>
+                        <button class="btn btn-secondary" id="t-btn-pause" onclick="stopTimer()">Szünet</button>
+                        <button class="btn btn-secondary" id="t-btn-reset" onclick="resetTimer()">Nullázás</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <span class="section-label" id="t-counter-section-lbl">HALADÁS</span>
+                    <h2 class="card-title">🔢 <span id="t-counter-title">Sorszámláló</span></h2>
+                    <div style="text-align: center;">
+                        <span style="font-family: 'Playfair Display', serif; font-size: 38px; color: var(--accent);" id="row-count">1. sor</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                        <div>
+                            <span class="section-label" id="t-current-pattern-lbl" style="margin-bottom: 2px;">AKTUÁLIS MINTA KÖVETÉSE</span>
+                            <h2 class="card-title" style="margin: 0;">📋 <span id="t-checklist-title">Kipipálható Minta</span></h2>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-danger-solid" id="t-btn-delete-pat" onclick="clearCurrentPattern()">🗑️ Minta Törlése</button>
+                            <button class="btn btn-secondary" id="t-btn-import" onclick="openImportModal()">📥 Minta Importálása</button>
+                        </div>
+                    </div>
+                    <div id="work-pattern-list">
+                        <p id="t-no-rows-work" style="color: var(--text-muted); font-style: italic; text-align: center;">Még nincs mentett sorod. Hozz létre mintát a Tervező lapon vagy importálj egyet!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. LAP: TERVEZŐ -->
+            <div id="design-tab" class="tab-content">
+                <div class="grand-total-card">
+                    <div>
+                        <span class="section-label" id="t-design-total-lbl">PLÜSS ÖSSZESÍTETT SZEMSZÁMA</span>
+                        <div style="font-weight: 700;" id="t-total-figure-lbl">A teljes megtervezett figura:</div>
+                    </div>
+                    <div class="grand-total-number" id="design-total-display">0 szem</div>
+                </div>
+
+                <div class="card">
+                    <span class="section-label" id="t-part-note-lbl">TESTRÉSZ CÍMSOR ÉS MEGJEGYZÉS</span>
+                    <div class="input-row" style="margin-bottom: 20px;">
+                        <input type="text" id="part-name" placeholder="Testrész neve (pl. Barna, Fej)..." style="flex:1;">
+                        <button class="btn btn-secondary" id="t-btn-add-part" onclick="addPartHeaderToPattern()">🏷️ Testrész felvétele</button>
+                    </div>
+                    <div class="input-row">
+                        <input type="text" id="row-note" placeholder="Utasítás / Megjegyzés..." style="flex:1;">
+                        <button class="btn btn-secondary" id="t-btn-add-note" onclick="addOnlyNoteToPattern()">💡 Megjegyzés beszúrása</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <span class="section-label" id="t-enter-row-lbl">SORMINTA BEVITELE</span>
+                    <div class="input-row">
+                        <input type="text" id="pattern-input" placeholder="Írd be a mintát (pl. (4rp, inc) x 6 (36))..." style="flex: 1;" oninput="calculateStitches()">
+                    </div>
+
+                    <div class="result-card" style="margin-top: 15px;">
+                        <div class="result-header">
+                            <span style="font-weight: 600;" id="t-calc-total-lbl">Kiszámított Összes Szem:</span>
+                            <span class="result-number" id="calc-total">0 szem</span>
+                        </div>
+                        <span class="section-label" id="t-recognized-lbl" style="margin-bottom: 6px;">FELISMERTE & RÉSZLETEZÉS:</span>
+                        <div id="calc-details">
+                            <span class="tag" id="lbl-recognized-tag">Felismerve: 0 szem</span>
+                        </div>
+                    </div>
+
+                    <button class="btn" id="t-btn-add-row" onclick="addCurrentRowToPattern()" style="width: 100%; justify-content: center;">➕ Sor hozzáadása a mintához</button>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                        <div>
+                            <h2 class="card-title" style="margin: 0;">📜 <span id="t-done-rows-title">Elkészült Minta Sorai</span></h2>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn btn-secondary" id="t-btn-new-pattern-design" onclick="startNewPattern()" style="border-color: #81b29a; color: #81b29a;">➕ Új Minta Kezdése</button>
+                            <button class="btn" id="t-btn-save-design" onclick="saveDesignToSidebar()" style="background-color: #81b29a;">💾 Mentés / Frissítés</button>
+                            <button class="btn btn-secondary" id="t-btn-txt-export" onclick="exportTXT()">💾 TXT Export</button>
+                            <button class="btn btn-secondary" id="t-btn-pdf-export" onclick="exportToPDF()">🖨️ PDF</button>
+                        </div>
+                    </div>
+                    <div id="designed-rows-list" style="margin-top: 20px;">
+                        <p id="t-no-added-rows" style="color: var(--text-muted); font-style: italic; text-align: center;">Még nincs hozzáadott sor.</p>
+                    </div>
+                    <div id="design-save-status" style="text-align: center; color: #81b29a; font-weight: bold; margin-top: 12px;"></div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title" id="t-dict-header">Támogatott Rövidítések & Szótár</h2>
+                    <div class="dictionary-grid" id="dictionary-container"></div>
+                </div>
+            </div>
+
+            <!-- 3. LAP: TERMÉK & PROJEKT -->
+            <div id="product-tab" class="tab-content">
+                <div class="card">
+                    <span class="section-label" id="t-prod-data-lbl">TERMÉK & PROJEKT ADATAI</span>
+                    <h2 class="card-title">🧸 <span id="t-plush-details-title">Figura, Fonal & Kellékek</span></h2>
+                    
+                    <div class="form-group">
+                        <label id="t-lbl-plush-name">Figura neve / megnevezése:</label>
+                        <input type="text" id="plush-name" placeholder="pl. Cuki Barna Maci..." oninput="updateProductCard()">
+                    </div>
+
+                    <div class="input-row">
+                        <div style="flex: 1;">
+                            <label id="t-lbl-status">Projekt státusz:</label>
+                            <select id="project-status" onchange="updateProductCard()">
+                                <option value="planned" id="opt-planned">🟡 Tervben</option>
+                                <option value="progress" id="opt-progress">🔵 Folyamatban (Horgolás alatt)</option>
+                                <option value="done" id="opt-done">🟢 Kész (Átadható / Eladható)</option>
+                                <option value="ordered" id="opt-ordered">🔴 Megrendelve</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label id="t-lbl-deadline">Határidő:</label>
+                            <input type="date" id="project-deadline" onchange="updateProductCard()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label id="t-lbl-client">Vevő neve (ha megrendelés):</label>
+                        <input type="text" id="client-name" placeholder="pl. Kovács Anna" oninput="updateProductCard()">
+                    </div>
+
+                    <div class="form-group">
+                        <label id="t-lbl-colors">Használt fonalak, színek & kódok:</label>
+                        <textarea id="plush-colors" rows="2" placeholder="pl. Himalaya Dolphin Baby: Barna (80337)" oninput="updateProductCard()"></textarea>
+                    </div>
+
+                    <div class="input-row">
+                        <div style="flex: 1;">
+                            <label id="t-lbl-hook">Horgolótű méret:</label>
+                            <input type="text" id="hook-size" placeholder="pl. 4.0 mm, Tulip" oninput="updateProductCard()">
+                        </div>
+                        <div style="flex: 1;">
+                            <label id="t-lbl-yarn-amount">Felhasznált fonalmennyiség:</label>
+                            <input type="text" id="yarn-amount" placeholder="pl. 1.5 gombolyag / 120g" oninput="updateProductCard()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label id="t-lbl-extras">Kiegészítő kellékek (biztonsági szem, tömőanyag, csörgő):</label>
+                        <input type="text" id="extra-tools" placeholder="pl. 12 mm fekete szem, 50g tömőanyag" oninput="updateProductCard()">
+                    </div>
+
+                    <div class="form-group">
+                        <label id="t-lbl-photo">📸 Kép feltöltése a kész plüssről / fázisról:</label>
+                        <input type="file" id="plush-photo-input" accept="image/*" onchange="loadPlushPhoto(event)">
+                        <img id="plush-photo-preview" class="photo-preview" alt="Plüss fotó előnézet">
+                    </div>
+                </div>
+
+                <div class="card">
+                    <span class="section-label" id="t-calc-section-lbl">IDŐ & KÖLTSÉGKALKULÁTOR</span>
+                    <h2 class="card-title">💰 <span id="t-price-calc-title">Eladási Ár Számító</span></h2>
+
+                    <div class="input-row" style="margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <label id="t-lbl-time-spent">Elkészítési idő (óra):</label>
+                            <input type="number" id="time-spent-hours" value="2" step="0.5" oninput="calculatePrice()">
+                        </div>
+                        <div style="flex: 1;">
+                            <label id="t-lbl-hourly-rate">Munkadíj / Órabér (Ft/óra):</label>
+                            <input type="number" id="hourly-rate" value="2000" step="100" oninput="calculatePrice()">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn btn-secondary" id="t-btn-sync-timer" onclick="syncTimeFromTimer()" style="width: 100%;">⏱️ Stopper idő beemelése</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label id="t-lbl-material-cost">Alapanyagköltség (Ft):</label>
+                        <input type="number" id="material-cost" value="2500" step="100" oninput="calculatePrice()">
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-header">
+                            <span id="t-lbl-min-price">1. Ajánlott minimális ár:</span>
+                            <span class="result-number" id="calculated-price">6 500 Ft</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><b id="t-lbl-own-price">2. Saját Ár (Kézi bevitel):</b></label>
+                        <input type="number" id="final-price" value="7000" oninput="updateProductCard()">
+                    </div>
+
+                    <button class="btn" id="t-btn-save-product" onclick="saveDesignToSidebar()" style="width: 100%; justify-content: center;">💾 Terméklap és Minta Mentése</button>
+                    <div id="save-status" style="text-align: center; color: #81b29a; font-weight: bold; margin-top: 8px;"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- JOBB SÁV -->
+        <div class="sidebar-card">
+            <span class="section-label" id="t-sidebar-lbl">SAJÁT MINTA & PROJEKT GYŰJTEMÉNY</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 class="card-title" id="t-saved-title" style="font-size: 20px; margin: 0;">📚 Elmentett Minták</h2>
+            </div>
+
+            <button class="btn" id="t-btn-new-pattern" onclick="startNewPattern()" style="width: 100%; margin-bottom: 15px; background-color: #81b29a;">➕ Új Minta Kezdése</button>
+            
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="search-input" placeholder="🔍 Keresés név alapján..." oninput="renderSavedSidebar()">
+            </div>
+
+            <div id="saved-patterns-list">
+                <p id="t-no-saved" style="color: var(--text-muted); font-style: italic; font-size: 13px;">Még nincs elmentett mintád.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL: IMPORTÁLÁS -->
+    <div class="modal-overlay" id="import-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); justify-content:center; align-items:center; z-index:100;">
+        <div class="modal-card" style="background:white; padding:30px; border-radius:24px; max-width:500px; width:90%;">
+            <h2 class="card-title" id="t-import-title">📥 Minta Importálása</h2>
+            <div class="form-group">
+                <label><b id="t-import-lbl">Vagy illeszd be a minta szövegét:</b></label>
+                <textarea id="import-text-area" rows="6" placeholder="pl.&#10;Barna&#10;sor: 1, rp 8 (8)"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" id="t-btn-cancel-import" onclick="closeImportModal()">Mégse</button>
+                <button class="btn" id="t-btn-submit-import" onclick="importFromText()">Szöveg Importálása</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: SOR SZERKESZTÉSE / TÍPUS MÓDOSÍTÁSA -->
+    <div class="modal-overlay" id="edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); justify-content:center; align-items:center; z-index:100;">
+        <div class="modal-card" style="background:white; padding:30px; border-radius:24px; max-width:500px; width:90%;">
+            <h2 class="card-title">✏️ Sor Módosítása</h2>
+            <input type="hidden" id="edit-index">
+            <div class="form-group">
+                <label>Elem típusa:</label>
+                <select id="edit-row-type">
+                    <option value="row">🧶 Horgolható sor (számolt)</option>
+                    <option value="header">🏷️ Testrész címsor</option>
+                    <option value="note">💡 Megjegyzés / Utasítás</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Szöveg:</label>
+                <textarea id="edit-row-text" rows="3"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeEditModal()">Mégse</button>
+                <button class="btn" onclick="saveEditedRow()">Mentés</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            hu: {
+                subtitle: "HORGOLÁSI NAPLÓ & MINTATERVEZŐ",
+                tab1: "🧶 1. MUNKATERÜLET",
+                tab2: "✏️ 2. TERVEZŐ",
+                tab3: "📊 3. TERMÉK & PROJEKT",
+                overallProgressLbl: "A PLÜSS TELJES HALADÁSA",
+                workProgressTxt: (done, total, pct) => `Kész: ${done} / Összesen: ${total} szem (${pct}%)`,
+                stDisplay: (n) => `${n} szem`,
+                timerSectionLbl: "IDŐNYILVÁNTARTÁS",
+                timerTitle: "Munkaidő Stopper",
+                btnStart: "Indítás",
+                btnPause: "Szünet",
+                btnReset: "Nullázás",
+                counterSectionLbl: "HALADÁS",
+                counterTitle: "Sorszámláló",
+                rowCount: (n) => `${n}. sor`,
+                currentPatternLbl: "AKTUÁLIS MINTA KÖVETÉSE",
+                checklistTitle: "Kipipálható Minta",
+                btnDeletePat: "🗑️ Minta Törlése",
+                btnImport: "📥 Minta Importálása",
+                noRowsWork: "Még nincs mentett sorod. Hozz létre mintát a Tervező lapon vagy importálj egyet!",
+                designTotalLbl: "PLÜSS ÖSSZESÍTETT SZEMSZÁMA",
+                totalFigureLbl: "A teljes megtervezett figura:",
+                partNoteLbl: "TESTRÉSZ CÍMSOR ÉS MEGJEGYZÉS",
+                partNamePlaceholder: "Testrész neve (pl. Barna, Fej)...",
+                btnAddPart: "🏷️ Testrész felvétele",
+                rowNotePlaceholder: "Utasítás / Megjegyzés...",
+                btnAddNote: "💡 Megjegyzés beszúrása",
+                enterRowLbl: "SORMINTA BEVITELE",
+                patternInputPlaceholder: "Írd be a mintát (pl. (4rp, inc) x 6 (36))...",
+                calcTotalLbl: "Kiszámított Összes Szem:",
+                recognizedLbl: "FELISMERTE & RÉSZLETEZÉS:",
+                recognizedTag: (n) => `Felismerve: ${n} szem`,
+                btnAddRow: "➕ Sor hozzáadása a mintához",
+                doneRowsTitle: "Elkészült Minta Sorai",
+                btnSaveDesign: "💾 Mentés / Frissítés",
+                btnNewPattern: "➕ Új Minta Kezdése",
+                btnTxtExport: "💾 TXT Export",
+                btnPdfExport: "🖨️ PDF",
+                noAddedRows: "Még nincs hozzáadott sor.",
+                dictHeader: "Támogatott Rövidítések & Szótár",
+                prodDataLbl: "TERMÉK & PROJEKT ADATAI",
+                plushDetailsTitle: "Figura, Fonal & Kellékek",
+                lblPlushName: "Figura neve / megnevezése:",
+                plushNamePlaceholder: "pl. Cuki Barna Maci...",
+                lblStatus: "Projekt státusz:",
+                optPlanned: "🟡 Tervben",
+                optProgress: "🔵 Folyamatban (Horgolás alatt)",
+                optDone: "🟢 Kész (Átadható / Eladható)",
+                optOrdered: "🔴 Megrendelve",
+                lblDeadline: "Határidő:",
+                lblClient: "Vevő neve (ha megrendelés):",
+                clientPlaceholder: "pl. Kovács Anna",
+                lblColors: "Használt fonalak, színek & kódok:",
+                colorsPlaceholder: "pl. Himalaya Dolphin Baby: Barna (80337)",
+                lblHook: "Horgolótű méret:",
+                hookPlaceholder: "pl. 4.0 mm, Tulip",
+                lblYarnAmount: "Felhasznált fonalmennyiség:",
+                yarnPlaceholder: "pl. 1.5 gombolyag / 120g",
+                lblExtras: "Kiegészítő kellékek (biztonsági szem, tömőanyag, csörgő):",
+                extrasPlaceholder: "pl. 12 mm fekete szem, 50g tömőanyag",
+                lblPhoto: "📸 Kép feltöltése a kész plüssről / fázisról:",
+                calcSectionLbl: "IDŐ & KÖLTSÉGKALKULÁTOR",
+                priceCalcTitle: "Eladási Ár Számító",
+                lblTimeSpent: "Elkészítési idő (óra):",
+                lblHourlyRate: "Munkadíj / Órabér (Ft/óra):",
+                btnSyncTimer: "⏱️ Stopper idő beemelése",
+                lblMaterialCost: "Alapanyagköltség (Ft):",
+                lblMinPrice: "1. Ajánlott minimális ár:",
+                lblOwnPrice: "2. Saját Ár (Kézi bevitel):",
+                btnSaveProduct: "💾 Terméklap és Minta Mentése",
+                sidebarLbl: "SAJÁT MINTA & PROJEKT GYŰJTEMÉNY",
+                savedTitle: "📚 Elmentett Minták",
+                searchPlaceholder: "🔍 Keresés név alapján...",
+                noSaved: "Még nincs elmentett mintád.",
+                importTitle: "📥 Minta Importálása",
+                importLbl: "Vagy illeszd be a minta szövegét:",
+                importPlaceholder: "pl.\nBarna\nsor: 1, rp 8 (8)",
+                btnCancelImport: "Mégse",
+                btnSubmitImport: "Szöveg Importálása",
+                saveSuccess: "✓ Projekt és minta sikeresen elmentve!",
+                dictItems: [
+                    { code: 'LSZ', desc: 'Láncszem' },
+                    { code: 'VK / MG', desc: 'Varázskör / Mágikus gyűrű' },
+                    { code: 'RP', desc: 'Rövidpálca' },
+                    { code: 'KSZ', desc: 'Kúszószem' },
+                    { code: 'SZAP / INC', desc: 'Szaporítás (Növelés)' },
+                    { code: 'FOGY / DEC', desc: 'Fogyasztás' },
+                    { code: 'FP', desc: 'Félpálca' }
+                ]
+            },
+            en: {
+                subtitle: "CROCHET JOURNAL & PATTERN DESIGNER",
+                tab1: "🧶 1. WORKSPACE",
+                tab2: "✏️ 2. DESIGNER",
+                tab3: "📊 3. PRODUCT & PROJECT",
+                overallProgressLbl: "PLUSH OVERALL PROGRESS",
+                workProgressTxt: (done, total, pct) => `Done: ${done} / Total: ${total} stitches (${pct}%)`,
+                stDisplay: (n) => `${n} stitches`,
+                timerSectionLbl: "TIME TRACKING",
+                timerTitle: "Work Timer",
+                btnStart: "Start",
+                btnPause: "Pause",
+                btnReset: "Reset",
+                counterSectionLbl: "PROGRESS",
+                counterTitle: "Row Counter",
+                rowCount: (n) => `Row ${n}`,
+                currentPatternLbl: "CURRENT PATTERN TRACKING",
+                checklistTitle: "Checklist Pattern",
+                btnDeletePat: "🗑️ Delete Pattern",
+                btnImport: "📥 Import Pattern",
+                noRowsWork: "No saved rows yet. Create a pattern in the Designer tab or import one!",
+                designTotalLbl: "PLUSH TOTAL STITCH COUNT",
+                totalFigureLbl: "The full designed figure:",
+                partNoteLbl: "PART HEADER & NOTE",
+                partNamePlaceholder: "Part name (e.g., Brown, Head)...",
+                btnAddPart: "🏷️ Add Part Header",
+                rowNotePlaceholder: "Instruction / Note...",
+                btnAddNote: "💡 Insert Note",
+                enterRowLbl: "ENTER ROW PATTERN",
+                patternInputPlaceholder: "Enter pattern (e.g., (4sc, inc) x 6 (36))...",
+                calcTotalLbl: "Calculated Total Stitches:",
+                recognizedLbl: "RECOGNIZED & DETAILS:",
+                recognizedTag: (n) => `Recognized: ${n} stitches`,
+                btnAddRow: "➕ Add Row to Pattern",
+                doneRowsTitle: "Finished Pattern Rows",
+                btnSaveDesign: "💾 Save / Update",
+                btnNewPattern: "➕ Start New Pattern",
+                btnTxtExport: "💾 TXT Export",
+                btnPdfExport: "🖨️ PDF",
+                noAddedRows: "No added rows yet.",
+                dictHeader: "Supported Abbreviations & Glossary",
+                prodDataLbl: "PRODUCT & PROJECT DATA",
+                plushDetailsTitle: "Figure, Yarn & Supplies",
+                lblPlushName: "Figure name / title:",
+                plushNamePlaceholder: "e.g. Cute Brown Bear...",
+                lblStatus: "Project status:",
+                optPlanned: "🟡 Planned",
+                optProgress: "🔵 In Progress (Crocheting)",
+                optDone: "🟢 Done (Ready / For Sale)",
+                optOrdered: "🔴 Ordered",
+                lblDeadline: "Deadline:",
+                lblClient: "Client name (if order):",
+                clientPlaceholder: "e.g. Anna Smith",
+                lblColors: "Yarns, colors & color codes used:",
+                colorsPlaceholder: "e.g. Himalaya Dolphin Baby: Brown (80337)",
+                lblHook: "Crochet hook size:",
+                hookPlaceholder: "e.g. 4.0 mm, Tulip",
+                lblYarnAmount: "Yarn amount used:",
+                yarnPlaceholder: "e.g. 1.5 skeins / 120g",
+                lblExtras: "Extra supplies (safety eyes, stuffing, rattle):",
+                extrasPlaceholder: "e.g. 12mm black eyes, 50g stuffing",
+                lblPhoto: "📸 Upload photo of finished plush / process:",
+                calcSectionLbl: "TIME & COST CALCULATOR",
+                priceCalcTitle: "Selling Price Calculator",
+                lblTimeSpent: "Time spent (hours):",
+                lblHourlyRate: "Hourly rate / Wage:",
+                btnSyncTimer: "⏱️ Sync from Timer",
+                lblMaterialCost: "Material cost:",
+                lblMinPrice: "1. Recommended minimum price:",
+                lblOwnPrice: "2. Custom Price (Manual entry):",
+                btnSaveProduct: "💾 Save Product & Pattern",
+                sidebarLbl: "MY PATTERN & PROJECT COLLECTION",
+                savedTitle: "📚 Saved Patterns",
+                searchPlaceholder: "🔍 Search by name...",
+                noSaved: "No saved patterns yet.",
+                importTitle: "📥 Import Pattern",
+                importLbl: "Or paste the pattern text:",
+                importPlaceholder: "e.g.\nBrown\nrow 1: sc 8 (8)",
+                btnCancelImport: "Cancel",
+                btnSubmitImport: "Import Text",
+                saveSuccess: "✓ Project and pattern saved successfully!",
+                dictItems: [
+                    { code: 'CH', desc: 'Chain' },
+                    { code: 'MR', desc: 'Magic Ring' },
+                    { code: 'SC', desc: 'Single Crochet' },
+                    { code: 'SL ST', desc: 'Slip Stitch' },
+                    { code: 'INC', desc: 'Increase' },
+                    { code: 'DEC', desc: 'Decrease' },
+                    { code: 'HDC', desc: 'Half Double Crochet' }
+                ]
+            },
+            pl: {
+                subtitle: "DZIENNIK SZYDEŁKOWANIA I PROJEKTANT WZORÓW",
+                tab1: "🧶 1. OBSZAR ROBOCZY",
+                tab2: "✏️ 2. PROJEKTANT",
+                tab3: "📊 3. PRODUKT I PROJEKT",
+                overallProgressLbl: "CAŁKOWITY POSTĘP MASKOTKI",
+                workProgressTxt: (done, total, pct) => `Gotowe: ${done} / Łącznie: ${total} oczek (${pct}%)`,
+                stDisplay: (n) => `${n} oczek`,
+                timerSectionLbl: "REJESTRACJA CZASU",
+                timerTitle: "Stoper Czasu Pracy",
+                btnStart: "Start",
+                btnPause: "Pauza",
+                btnReset: "Reset",
+                counterSectionLbl: "POSTĘP",
+                counterTitle: "Licznik Rzędów",
+                rowCount: (n) => `Rząd ${n}`,
+                currentPatternLbl: "ŚLEDZENIE AKTUALNEGO WZORU",
+                checklistTitle: "Wzór do Odznaczania",
+                btnDeletePat: "🗑️ Usuń Wzór",
+                btnImport: "📥 Importuj Wzór",
+                noRowsWork: "Brak zapisanych rzędów. Utwórz wzór w zakładce Projektant lub zaimportuj!",
+                designTotalLbl: "CAŁKOWITA LICZBA OCZEK MASKOTKI",
+                totalFigureLbl: "Cała zaprojektowana maskotka:",
+                partNoteLbl: "NAGŁÓWEK CZĘŚCI I UWAGA",
+                partNamePlaceholder: "Nazwa części (np. Brązowy, Głowa)...",
+                btnAddPart: "🏷️ Dodaj Nagłówek Części",
+                rowNotePlaceholder: "Instrukcja / Uwaga...",
+                btnAddNote: "💡 Wstaw Uwagę",
+                enterRowLbl: "WPROWADZANIE WZORU RZĘDU",
+                patternInputPlaceholder: "Wpisz wzór (np. (4sc, inc) x 6 (36))...",
+                calcTotalLbl: "Obliczona Łączna Liczba Oczek:",
+                recognizedLbl: "ROZPOZNANO I SZCZEGÓŁY:",
+                recognizedTag: (n) => `Rozpoznano: ${n} oczek`,
+                btnAddRow: "➕ Dodaj Rząd do Wzoru",
+                doneRowsTitle: "Rzędy Gotowego Wzoru",
+                btnSaveDesign: "💾 Zapisz / Aktualizuj",
+                btnNewPattern: "➕ Rozpocznij Nowy Wzór",
+                btnTxtExport: "💾 Eksport TXT",
+                btnPdfExport: "🖨️ PDF",
+                noAddedRows: "Brak dodanych rzędów.",
+                dictHeader: "Obsługiwane Skróty i Słownik",
+                prodDataLbl: "DANE PRODUKTU I PROJEKTU",
+                plushDetailsTitle: "Maskotka, Włóczka i Akcesoria",
+                lblPlushName: "Nazwa maskotki / opis:",
+                plushNamePlaceholder: "np. Słodki Brązowy Miś...",
+                lblStatus: "Status projektu:",
+                optPlanned: "🟡 W planach",
+                optProgress: "🔵 W trakcie (Szydełkowanie)",
+                optDone: "🟢 Gotowe (Do przekazania / Sprzedaży)",
+                optOrdered: "🔴 Zamówiono",
+                lblDeadline: "Termin:",
+                lblClient: "Nazwa klienta (jeśli zamówienie):",
+                clientPlaceholder: "np. Anna Kowalska",
+                lblColors: "Użyte włóczki, kolory i kody:",
+                colorsPlaceholder: "np. Himalaya Dolphin Baby: Brązowy (80337)",
+                lblHook: "Rozmiar szydełka:",
+                hookPlaceholder: "np. 4.0 mm, Tulip",
+                lblYarnAmount: "Zużyta ilość włóczki:",
+                yarnPlaceholder: "np. 1.5 motka / 120g",
+                lblExtras: "Dodatkowe akcesoria (bezpieczne oczy, wypełnienie):",
+                extrasPlaceholder: "np. 12mm czarne oczy, 50g wypełnienia",
+                lblPhoto: "📸 Prześlij zdjęcie gotowej maskotki / etapu:",
+                calcSectionLbl: "KALKULATOR CZASU I KOSZTÓW",
+                priceCalcTitle: "Kalkulator Ceny Sprzedaży",
+                lblTimeSpent: "Czas wykonania (godziny):",
+                lblHourlyRate: "Stawka godzinowa:",
+                btnSyncTimer: "⏱️ Pobierz czas ze stopera",
+                lblMaterialCost: "Koszt materiałów:",
+                lblMinPrice: "1. Zalecana cena minimalna:",
+                lblOwnPrice: "2. Własna Cena (Wprowadzanie ręczne):",
+                btnSaveProduct: "💾 Zapisz Karta Produktu i Wzór",
+                sidebarLbl: "MOJA KOLEKCJA WZORÓW I PROJEKTÓW",
+                savedTitle: "📚 Zapisane Wzory",
+                searchPlaceholder: "🔍 Szukaj według nazwy...",
+                noSaved: "Brak zapisanych wzorów.",
+                importTitle: "📥 Importuj Wzór",
+                importLbl: "Lub wklej tekst wzoru:",
+                importPlaceholder: "np.\nBrązowy\nrząd 1: sc 8 (8)",
+                btnCancelImport: "Anuluj",
+                btnSubmitImport: "Importuj Tekst",
+                saveSuccess: "✓ Projekt i wzór zostały pomyślnie zapisane!",
+                dictItems: [
+                    { code: 'OŁ / ch', desc: 'Oczko łańcuszka' },
+                    { code: 'MR / amigu', desc: 'Kółko amigurumi (Magiczny pierścień)' },
+                    { code: 'PŁS / sc', desc: 'Półsłupek / Słupek krótki' },
+                    { code: 'OS / ps', desc: 'Oczko ślepe (Oczko ścisłe)' },
+                    { code: 'DOD / inc', desc: 'Zwiększenie (Dodawanie)' },
+                    { code: 'ODB / dec', desc: 'Zmniejszenie (Odejmowanie)' },
+                    { code: 'PST / hdc', desc: 'Półsłupek z narzutem' }
+                ]
+            }
+        };
+
+        let currentLang = 'hu';
+        let patternRows = []; 
+        let savedPatterns = [];
+        let activePatternId = null; 
+        let currentPhotoBase64 = "";
+
+        window.onload = function() {
+            loadSavedPatternsFromStorage();
+            changeLanguage();
+        };
+
+        function changeLanguage() {
+            currentLang = document.getElementById('lang-select').value;
+            const t = translations[currentLang];
+
+            document.getElementById('t-subtitle').innerText = t.subtitle;
+            document.getElementById('t-tab1').innerText = t.tab1;
+            document.getElementById('t-tab2').innerText = t.tab2;
+            document.getElementById('t-tab3').innerText = t.tab3;
+
+            document.getElementById('t-overall-progress-lbl').innerText = t.overallProgressLbl;
+            document.getElementById('t-timer-section-lbl').innerText = t.timerSectionLbl;
+            document.getElementById('t-timer-title').innerText = t.timerTitle;
+            document.getElementById('t-btn-start').innerText = t.btnStart;
+            document.getElementById('t-btn-pause').innerText = t.btnPause;
+            document.getElementById('t-btn-reset').innerText = t.btnReset;
+            document.getElementById('t-counter-section-lbl').innerText = t.counterSectionLbl;
+            document.getElementById('t-counter-title').innerText = t.counterTitle;
+            document.getElementById('t-current-pattern-lbl').innerText = t.currentPatternLbl;
+            document.getElementById('t-checklist-title').innerText = t.checklistTitle;
+            document.getElementById('t-btn-delete-pat').innerText = t.btnDeletePat;
+            document.getElementById('t-btn-import').innerText = t.btnImport;
+
+            document.getElementById('t-design-total-lbl').innerText = t.designTotalLbl;
+            document.getElementById('t-total-figure-lbl').innerText = t.totalFigureLbl;
+            document.getElementById('t-part-note-lbl').innerText = t.partNoteLbl;
+            document.getElementById('part-name').placeholder = t.partNamePlaceholder;
+            document.getElementById('t-btn-add-part').innerText = t.btnAddPart;
+            document.getElementById('row-note').placeholder = t.rowNotePlaceholder;
+            document.getElementById('t-btn-add-note').innerText = t.btnAddNote;
+            document.getElementById('t-enter-row-lbl').innerText = t.enterRowLbl;
+            document.getElementById('pattern-input').placeholder = t.patternInputPlaceholder;
+            document.getElementById('t-calc-total-lbl').innerText = t.calcTotalLbl;
+            document.getElementById('t-recognized-lbl').innerText = t.recognizedLbl;
+            document.getElementById('t-btn-add-row').innerText = t.btnAddRow;
+            document.getElementById('t-done-rows-title').innerText = t.doneRowsTitle;
+            document.getElementById('t-btn-save-design').innerText = t.btnSaveDesign;
+            document.getElementById('t-btn-new-pattern').innerText = t.btnNewPattern;
+            document.getElementById('t-btn-new-pattern-design').innerText = t.btnNewPattern;
+            document.getElementById('t-btn-txt-export').innerText = t.btnTxtExport;
+            document.getElementById('t-btn-pdf-export').innerText = t.btnPdfExport;
+            document.getElementById('t-dict-header').innerText = t.dictHeader;
+
+            document.getElementById('t-prod-data-lbl').innerText = t.prodDataLbl;
+            document.getElementById('t-plush-details-title').innerText = t.plushDetailsTitle;
+            document.getElementById('t-lbl-plush-name').innerText = t.lblPlushName;
+            document.getElementById('plush-name').placeholder = t.plushNamePlaceholder;
+            document.getElementById('t-lbl-status').innerText = t.lblStatus;
+            document.getElementById('opt-planned').innerText = t.optPlanned;
+            document.getElementById('opt-progress').innerText = t.optProgress;
+            document.getElementById('opt-done').innerText = t.optDone;
+            document.getElementById('opt-ordered').innerText = t.optOrdered;
+            document.getElementById('t-lbl-deadline').innerText = t.lblDeadline;
+            document.getElementById('t-lbl-client').innerText = t.lblClient;
+            document.getElementById('client-name').placeholder = t.clientPlaceholder;
+            document.getElementById('t-lbl-colors').innerText = t.lblColors;
+            document.getElementById('plush-colors').placeholder = t.colorsPlaceholder;
+            document.getElementById('t-lbl-hook').innerText = t.lblHook;
+            document.getElementById('hook-size').placeholder = t.hookPlaceholder;
+            document.getElementById('t-lbl-yarn-amount').innerText = t.lblYarnAmount;
+            document.getElementById('yarn-amount').placeholder = t.yarnPlaceholder;
+            document.getElementById('t-lbl-extras').innerText = t.lblExtras;
+            document.getElementById('extra-tools').placeholder = t.extrasPlaceholder;
+            document.getElementById('t-lbl-photo').innerText = t.lblPhoto;
+
+            document.getElementById('t-calc-section-lbl').innerText = t.calcSectionLbl;
+            document.getElementById('t-price-calc-title').innerText = t.priceCalcTitle;
+            document.getElementById('t-lbl-time-spent').innerText = t.lblTimeSpent;
+            document.getElementById('t-lbl-hourly-rate').innerText = t.lblHourlyRate;
+            document.getElementById('t-btn-sync-timer').innerText = t.btnSyncTimer;
+            document.getElementById('t-lbl-material-cost').innerText = t.lblMaterialCost;
+            document.getElementById('t-lbl-min-price').innerText = t.lblMinPrice;
+            document.getElementById('t-lbl-own-price').innerText = t.lblOwnPrice;
+            document.getElementById('t-btn-save-product').innerText = t.btnSaveProduct;
+
+            document.getElementById('t-sidebar-lbl').innerText = t.sidebarLbl;
+            document.getElementById('t-saved-title').innerText = t.savedTitle;
+            document.getElementById('search-input').placeholder = t.searchPlaceholder;
+            document.getElementById('t-import-title').innerText = t.importTitle;
+            document.getElementById('t-import-lbl').innerText = t.importLbl;
+            document.getElementById('import-text-area').placeholder = t.importPlaceholder;
+            document.getElementById('t-btn-cancel-import').innerText = t.btnCancelImport;
+            document.getElementById('t-btn-submit-import').innerText = t.btnSubmitImport;
+
+            renderDictionary();
+            renderPatternLists();
+            renderSavedSidebar();
+        }
+
+        function renderDictionary() {
+            const container = document.getElementById('dictionary-container');
+            container.innerHTML = '';
+            translations[currentLang].dictItems.forEach(item => {
+                container.innerHTML += `
+                    <div class="dict-card">
+                        <div class="dict-title">${item.code}</div>
+                        <div class="dict-desc">${item.desc}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function switchTab(tabId, event) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if(event) event.currentTarget.classList.add('active');
+        }
+
+        function openImportModal() { document.getElementById('import-modal').style.display = 'flex'; }
+        function closeImportModal() { document.getElementById('import-modal').style.display = 'none'; }
+
+        function openEditModal(index) {
+            const item = patternRows[index];
+            document.getElementById('edit-index').value = index;
+            document.getElementById('edit-row-type').value = item.type;
+            document.getElementById('edit-row-text').value = item.text;
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+        function saveEditedRow() {
+            const index = parseInt(document.getElementById('edit-index').value);
+            const newType = document.getElementById('edit-row-type').value;
+            const newText = document.getElementById('edit-row-text').value.trim();
+            if(!newText) return;
+
+            let stCount = (newType === 'row') ? parseStitchesFromText(newText) : 0;
+            patternRows[index] = {
+                type: newType,
+                text: newText,
+                stitches: stCount,
+                checked: patternRows[index].checked || false
+            };
+            closeEditModal();
+            renderPatternLists();
+        }
+
+        /* Stopper */
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        function startTimer() {
+            if(!timerInterval) {
+                timerInterval = setInterval(() => {
+                    secondsElapsed++;
+                    let m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+                    let s = (secondsElapsed % 60).toString().padStart(2, '0');
+                    document.getElementById('timer').innerText = `${m}:${s}`;
+                }, 1000);
+            }
+        }
+        function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+        function resetTimer() { stopTimer(); secondsElapsed = 0; document.getElementById('timer').innerText = "00:00"; }
+
+        /* Szemszám kalkulátor */
+        function parseStitchesFromText(text) {
+            if (!text) return 0;
+            let explicitMatch = text.match(/\((\d+)\)\s*$/);
+            if (explicitMatch) return parseInt(explicitMatch[1]);
+
+            let total = 0;
+            let cleaned = text.toLowerCase();
+            let mulMatch = cleaned.match(/(?:x|\*)\s*(\d+)/);
+            let multiplier = mulMatch ? parseInt(mulMatch[1]) : 1;
+
+            let scMatch = cleaned.match(/(\d+)\s*(?:sc|rp|płs)/g);
+            if (scMatch) {
+                scMatch.forEach(m => { let num = parseInt(m); if(!isNaN(num)) total += num; });
+            } else if (cleaned.includes('sc') || cleaned.includes('rp') || cleaned.includes('płs')) {
+                total += 1;
+            }
+            if (cleaned.includes('inc') || cleaned.includes('szap') || cleaned.includes('dod')) total += 2;
+            if (cleaned.includes('dec') || cleaned.includes('fogy') || cleaned.includes('odb')) total += 1;
+
+            return total * multiplier;
+        }
+
+        function calculateStitches() {
+            const input = document.getElementById('pattern-input').value;
+            const count = parseStitchesFromText(input);
+            const t = translations[currentLang];
+            document.getElementById('calc-total').innerText = t.stDisplay(count);
+            document.getElementById('lbl-recognized-tag').innerText = t.recognizedTag(count);
+        }
+
+        function addCurrentRowToPattern() {
+            const input = document.getElementById('pattern-input').value.trim();
+            if (!input) return;
+            const count = parseStitchesFromText(input);
+
+            patternRows.push({ type: 'row', text: input, stitches: count, checked: false });
+            document.getElementById('pattern-input').value = '';
+            calculateStitches();
+            renderPatternLists();
+        }
+
+        function addPartHeaderToPattern() {
+            const input = document.getElementById('part-name').value.trim();
+            if (!input) return;
+            patternRows.push({ type: 'header', text: input, stitches: 0, checked: false });
+            document.getElementById('part-name').value = '';
+            renderPatternLists();
+        }
+
+        function addOnlyNoteToPattern() {
+            const input = document.getElementById('row-note').value.trim();
+            if (!input) return;
+            patternRows.push({ type: 'note', text: input, stitches: 0, checked: false });
+            document.getElementById('row-note').value = '';
+            renderPatternLists();
+        }
+
+        function deleteRow(index) {
+            patternRows.splice(index, 1);
+            renderPatternLists();
+        }
+
+        function clearCurrentPattern() {
+            if(confirm("Biztosan törölni szeretnéd a munkaterületen lévő mintát?")) {
+                startNewPattern();
+            }
+        }
+
+        function toggleRowCheck(index) {
+            patternRows[index].checked = !patternRows[index].checked;
+            renderPatternLists();
+        }
+
+        function startNewPattern() {
+            patternRows = [];
+            activePatternId = null;
+            currentPhotoBase64 = "";
+            document.getElementById('plush-name').value = '';
+            document.getElementById('plush-colors').value = '';
+            document.getElementById('hook-size').value = '';
+            document.getElementById('yarn-amount').value = '';
+            document.getElementById('extra-tools').value = '';
+            document.getElementById('client-name').value = '';
+            document.getElementById('project-status').value = 'planned';
+            document.getElementById('project-deadline').value = '';
+            document.getElementById('final-price').value = '7000';
+            document.getElementById('plush-photo-preview').style.display = 'none';
+            document.getElementById('plush-photo-input').value = '';
+            
+            resetTimer();
+            renderPatternLists();
+            renderSavedSidebar();
+        }
+
+        function renderPatternLists() {
+            const workContainer = document.getElementById('work-pattern-list');
+            const designContainer = document.getElementById('designed-rows-list');
+            const t = translations[currentLang];
+
+            let totalStitches = 0;
+            let doneStitches = 0;
+            let checkedRowsCount = 0;
+
+            if (patternRows.length === 0) {
+                workContainer.innerHTML = `<p style="color: var(--text-muted); font-style: italic; text-align: center;">${t.noRowsWork}</p>`;
+                designContainer.innerHTML = `<p style="color: var(--text-muted); font-style: italic; text-align: center;">${t.noAddedRows}</p>`;
+            } else {
+                workContainer.innerHTML = '';
+                designContainer.innerHTML = '';
+
+                patternRows.forEach((item, index) => {
+                    totalStitches += item.stitches || 0;
+                    if (item.checked) {
+                        doneStitches += item.stitches || 0;
+                        if (item.type === 'row') {
+                            checkedRowsCount++;
+                        }
+                    }
+
+                    if (item.type === 'header') {
+                        workContainer.innerHTML += `<div class="pattern-row-item part-header"><span>🏷️ ${item.text}</span></div>`;
+                        designContainer.innerHTML += `
+                            <div class="pattern-row-item part-header">
+                                <span>🏷️ ${item.text}</span>
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="btn-edit-solid" onclick="openEditModal(${index})">Módosítás</button>
+                                    <button class="btn-danger-solid" onclick="deleteRow(${index})">Törlés</button>
+                                </div>
+                            </div>`;
+                    } else if (item.type === 'note') {
+                        workContainer.innerHTML += `<div class="pattern-row-item note-item"><span>💡 ${item.text}</span></div>`;
+                        designContainer.innerHTML += `
+                            <div class="pattern-row-item note-item">
+                                <span>💡 ${item.text}</span>
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="btn-edit-solid" onclick="openEditModal(${index})">Módosítás</button>
+                                    <button class="btn-danger-solid" onclick="deleteRow(${index})">Törlés</button>
+                                </div>
+                            </div>`;
+                    } else {
+                        workContainer.innerHTML += `
+                            <div class="pattern-row-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleRowCheck(${index})">
+                                    <span class="${item.checked ? 'checked-text' : ''}">${item.text}</span>
+                                </label>
+                            </div>
+                        `;
+                        designContainer.innerHTML += `
+                            <div class="pattern-row-item">
+                                <span>🧶 ${item.text} (${t.stDisplay(item.stitches)})</span>
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="btn-edit-solid" onclick="openEditModal(${index})">Módosítás</button>
+                                    <button class="btn-danger-solid" onclick="deleteRow(${index})">Törlés</button>
+                                </div>
+                            </div>`;
+                    }
+                });
+            }
+
+            let currentRow = checkedRowsCount + 1;
+            document.getElementById('row-count').innerText = t.rowCount(currentRow);
+
+            document.getElementById('work-total-display').innerText = t.stDisplay(totalStitches);
+            document.getElementById('design-total-display').innerText = t.stDisplay(totalStitches);
+
+            let pct = totalStitches > 0 ? Math.round((doneStitches / totalStitches) * 100) : 0;
+            document.getElementById('work-progress-text').innerText = t.workProgressTxt(doneStitches, totalStitches, pct);
+            document.getElementById('progress-fill').style.width = `${pct}%`;
+        }
+
+        function loadPlushPhoto(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentPhotoBase64 = e.target.result;
+                const preview = document.getElementById('plush-photo-preview');
+                preview.src = currentPhotoBase64;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function saveDesignToSidebar() {
+            let patternName = document.getElementById('plush-name').value.trim() || "Névtelen Minta";
+            const t = translations[currentLang];
+            
+            const patternData = {
+                id: activePatternId || Date.now(),
+                plushName: patternName,
+                plushColors: document.getElementById('plush-colors').value,
+                hookSize: document.getElementById('hook-size').value,
+                yarnAmount: document.getElementById('yarn-amount').value,
+                extraTools: document.getElementById('extra-tools').value,
+                clientName: document.getElementById('client-name').value,
+                status: document.getElementById('project-status').value,
+                deadline: document.getElementById('project-deadline').value,
+                photo: currentPhotoBase64,
+                finalPrice: document.getElementById('final-price').value,
+                patternRows: JSON.parse(JSON.stringify(patternRows))
+            };
+
+            if (activePatternId) {
+                let index = savedPatterns.findIndex(p => p.id === activePatternId);
+                if (index !== -1) savedPatterns[index] = patternData;
+                else savedPatterns.push(patternData);
+            } else {
+                savedPatterns.push(patternData);
+                activePatternId = patternData.id;
+            }
+
+            localStorage.setItem('pendlipop_patterns', JSON.stringify(savedPatterns));
+            renderSavedSidebar();
+
+            const status = document.getElementById('design-save-status');
+            status.innerText = t.saveSuccess;
+            setTimeout(() => status.innerText = "", 3000);
+        }
+
+        function loadSavedPattern(id) {
+            const item = savedPatterns.find(p => p.id === id);
+            if (item) {
+                activePatternId = item.id;
+                patternRows = JSON.parse(JSON.stringify(item.patternRows || []));
+                document.getElementById('plush-name').value = item.plushName || '';
+                document.getElementById('plush-colors').value = item.plushColors || '';
+                document.getElementById('hook-size').value = item.hookSize || '';
+                document.getElementById('yarn-amount').value = item.yarnAmount || '';
+                document.getElementById('extra-tools').value = item.extraTools || '';
+                document.getElementById('client-name').value = item.clientName || '';
+                document.getElementById('project-status').value = item.status || 'planned';
+                document.getElementById('project-deadline').value = item.deadline || '';
+                document.getElementById('final-price').value = item.finalPrice || '7000';
+
+                currentPhotoBase64 = item.photo || '';
+                const preview = document.getElementById('plush-photo-preview');
+                if(currentPhotoBase64) {
+                    preview.src = currentPhotoBase64;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
+                
+                renderPatternLists();
+                renderSavedSidebar(); 
+            }
+        }
+
+        function deleteSavedPattern(event, id) {
+            event.stopPropagation(); // Ez állítja meg, hogy betöltődjön a minta törlés közben!
+            if (confirm("Biztosan törölni szeretnéd ezt a projektet?")) {
+                savedPatterns = savedPatterns.filter(p => p.id !== id);
+                localStorage.setItem('pendlipop_patterns', JSON.stringify(savedPatterns));
+                if (activePatternId === id) startNewPattern();
+                else renderSavedSidebar();
+            }
+        }
+
+        function loadSavedPatternsFromStorage() {
+            const stored = localStorage.getItem('pendlipop_patterns');
+            if (stored) {
+                try { savedPatterns = JSON.parse(stored); } catch(e) { savedPatterns = []; }
+            }
+        }
+
+        function renderSavedSidebar() {
+            const container = document.getElementById('saved-patterns-list');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const filtered = savedPatterns.filter(p => p.plushName.toLowerCase().includes(search));
+            const t = translations[currentLang];
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted); font-style: italic; font-size: 13px;">${t.noSaved}</p>`;
+            } else {
+                container.innerHTML = '';
+                filtered.forEach(p => {
+                    const isActive = (p.id === activePatternId);
+                    let dotClass = 'status-planned';
+                    if(p.status === 'progress') dotClass = 'status-progress';
+                    if(p.status === 'done') dotClass = 'status-done';
+                    if(p.status === 'ordered') dotClass = 'status-ordered';
+
+                    container.innerHTML += `
+                        <div class="saved-pattern-card ${isActive ? 'active-pattern' : ''}" style="cursor: pointer;" onclick="loadSavedPattern(${p.id})">
+                            <div>
+                                <span class="status-dot ${dotClass}" title="Státusz"></span>
+                                <b>${p.plushName}</b>
+                                <div style="font-size:11px; color: var(--text-muted);">${p.patternRows.length} elem ${p.deadline ? '• ' + p.deadline : ''}</div>
+                            </div>
+                            <button class="btn-danger-solid" style="padding: 6px 10px; font-size: 11px;" onclick="deleteSavedPattern(event, ${p.id})" title="Törlés">🗑️</button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function exportTXT() {
+            let txt = "PENDLIPÖP PLÜSSEII - MINTA\n=========================\n\n";
+            patternRows.forEach(r => {
+                if (r.type === 'header') txt += `\n--- ${r.text.toUpperCase()} ---\n`;
+                else if (r.type === 'note') txt += `Megjegyzés: ${r.text}\n`;
+                else txt += `${r.text}\n`;
+            });
+            const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'minta.txt';
+            a.click();
+        }
+
+        function exportToPDF() { window.print(); }
+        function importFromText() {
+            const rawText = document.getElementById('import-text-area').value.trim();
+            if (!rawText) return;
+            rawText.split('\n').forEach(line => {
+                let trimmed = line.trim();
+                if (!trimmed) return;
+                let stCount = parseStitchesFromText(trimmed);
+                patternRows.push({ type: 'row', text: trimmed, stitches: stCount, checked: false });
+            });
+            renderPatternLists();
+            closeImportModal();
+        }
+        function updateProductCard() {}
+        function calculatePrice() {
+            const hours = parseFloat(document.getElementById('time-spent-hours').value) || 0;
+            const rate = parseFloat(document.getElementById('hourly-rate').value) || 0;
+            const material = parseFloat(document.getElementById('material-cost').value) || 0;
+            const calc = (hours * rate) + material;
+            document.getElementById('calculated-price').innerText = `${calc.toLocaleString('hu-HU')} Ft`;
+        }
+        function syncTimeFromTimer() {
+            let h = (secondsElapsed / 3600).toFixed(1);
+            document.getElementById('time-spent-hours').value = Math.max(0.5, h);
+            calculatePrice();
+        }
+    </script>
+</body>
+</html>
