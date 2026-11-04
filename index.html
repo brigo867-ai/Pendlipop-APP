@@ -10,6 +10,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- PDF.js Könyvtár PDF importáláshoz -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
     <style>
         :root {
             --bg-main: #FAF5EF;
@@ -355,6 +362,7 @@
             top: 30px;
         }
 
+        /* Drag and Drop elemek stílusa */
         .pattern-row-item {
             display: flex;
             align-items: center;
@@ -364,7 +372,31 @@
             border-radius: 12px;
             margin-bottom: 8px;
             border: 1px solid var(--border-light);
+            gap: 10px;
+            cursor: grab;
+            user-select: none;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
+        .pattern-row-item:active {
+            cursor: grabbing;
+        }
+        .pattern-row-item.dragging {
+            opacity: 0.4;
+            background: #E59885 !important;
+        }
+        .pattern-row-item.drag-over {
+            border: 2px dashed var(--accent);
+            background: #FDF3F0;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 16px;
+            padding: 0 4px;
+        }
+
         .pattern-row-item.part-header {
             background: var(--accent);
             color: white;
@@ -422,14 +454,36 @@
         .status-done { background: #5cb85c; }
         .status-ordered { background: #d9534f; }
 
+        .custom-dropzone {
+            border: 2px dashed var(--accent);
+            border-radius: 18px;
+            background: var(--card-sub);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .custom-dropzone:hover {
+            background: #F5EAE0;
+            border-color: var(--accent-hover);
+        }
+        .photo-preview-container {
+            margin-top: 15px;
+            position: relative;
+            display: none;
+        }
         .photo-preview {
             width: 100%;
-            max-height: 180px;
+            max-height: 240px;
             object-fit: cover;
-            border-radius: 12px;
-            margin-top: 10px;
-            display: none;
+            border-radius: 16px;
             border: 1px solid var(--border-light);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         @media print {
@@ -531,6 +585,14 @@
                 </div>
 
                 <div class="card">
+                    <span class="section-label">MINTA ELNEVEZÉSE</span>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="design-pattern-name">Minta / Figura neve:</label>
+                        <input type="text" id="design-pattern-name" placeholder="pl. My Little Heart, Cuki Barna Maci..." oninput="syncPatternName(this.value)">
+                    </div>
+                </div>
+
+                <div class="card">
                     <span class="section-label" id="t-part-note-lbl">TESTRÉSZ CÍMSOR ÉS MEGJEGYZÉS</span>
                     <div class="input-row" style="margin-bottom: 20px;">
                         <input type="text" id="part-name" placeholder="Testrész neve (pl. Barna, Fej)..." style="flex:1;">
@@ -566,6 +628,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
                         <div>
                             <h2 class="card-title" style="margin: 0;">📜 <span id="t-done-rows-title">Elkészült Minta Sorai</span></h2>
+                            <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0;">💡 Húzd a sorokat az egérrel az átrendezéshez!</p>
                         </div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                             <button class="btn btn-secondary" id="t-btn-new-pattern-design" onclick="startNewPattern()" style="border-color: #81b29a; color: #81b29a;">➕ Új Minta Kezdése</button>
@@ -594,7 +657,7 @@
                     
                     <div class="form-group">
                         <label id="t-lbl-plush-name">Figura neve / megnevezése:</label>
-                        <input type="text" id="plush-name" placeholder="pl. Cuki Barna Maci..." oninput="updateProductCard()">
+                        <input type="text" id="plush-name" placeholder="pl. Cuki Barna Maci..." oninput="syncPatternName(this.value)">
                     </div>
 
                     <div class="input-row">
@@ -641,8 +704,18 @@
 
                     <div class="form-group">
                         <label id="t-lbl-photo">📸 Kép feltöltése a kész plüssről / fázisról:</label>
-                        <input type="file" id="plush-photo-input" accept="image/*" onchange="loadPlushPhoto(event)">
-                        <img id="plush-photo-preview" class="photo-preview" alt="Plüss fotó előnézet">
+                        
+                        <div class="custom-dropzone" onclick="document.getElementById('plush-photo-input').click()">
+                            <span style="font-size: 32px;">📷</span>
+                            <span style="font-weight: bold; color: var(--accent);">Kattints ide a kép feltöltéséhez</span>
+                            <span style="font-size: 12px; color: var(--text-muted);">Vagy húzd ide a képfájlt (JPG, PNG)</span>
+                        </div>
+                        <input type="file" id="plush-photo-input" accept="image/*" style="display:none;" onchange="loadPlushPhoto(event)">
+                        
+                        <div id="photo-preview-box" class="photo-preview-container">
+                            <img id="plush-photo-preview" class="photo-preview" alt="Plüss fotó előnézet">
+                            <button class="btn-danger-solid" style="margin-top: 10px; width: 100%;" onclick="removePhoto()">🗑️ Kép Törlése</button>
+                        </div>
                     </div>
                 </div>
 
@@ -711,8 +784,16 @@
 
     <!-- MODAL: IMPORTÁLÁS -->
     <div class="modal-overlay" id="import-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); justify-content:center; align-items:center; z-index:100;">
-        <div class="modal-card" style="background:white; padding:30px; border-radius:24px; max-width:500px; width:90%;">
+        <div class="modal-card" style="background:white; padding:30px; border-radius:24px; max-width:520px; width:90%;">
             <h2 class="card-title" id="t-import-title">📥 Minta Importálása</h2>
+            
+            <div class="form-group">
+                <label><b>📄 Fájl feltöltése (PDF vagy TXT):</b></label>
+                <input type="file" id="import-file-input" accept=".pdf, .txt" onchange="handleFileImport(event)">
+            </div>
+            
+            <hr style="border: none; border-top: 1px solid var(--border-light); margin: 15px 0;">
+
             <div class="form-group">
                 <label><b id="t-import-lbl">Vagy illeszd be a minta szövegét:</b></label>
                 <textarea id="import-text-area" rows="6" placeholder="pl.&#10;Barna&#10;sor: 1, rp 8 (8)"></textarea>
@@ -724,7 +805,7 @@
         </div>
     </div>
 
-    <!-- MODAL: SOR SZERKESZTÉSE / TÍPUS MÓDOSÍTÁSA -->
+    <!-- MODAL: SOR SZERKESZTÉSE -->
     <div class="modal-overlay" id="edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); justify-content:center; align-items:center; z-index:100;">
         <div class="modal-card" style="background:white; padding:30px; border-radius:24px; max-width:500px; width:90%;">
             <h2 class="card-title">✏️ Sor Módosítása</h2>
@@ -1030,11 +1111,17 @@
         let savedPatterns = [];
         let activePatternId = null; 
         let currentPhotoBase64 = "";
+        let draggedIndex = null;
 
         window.onload = function() {
             loadSavedPatternsFromStorage();
             changeLanguage();
         };
+
+        function syncPatternName(val) {
+            document.getElementById('design-pattern-name').value = val;
+            document.getElementById('plush-name').value = val;
+        }
 
         function changeLanguage() {
             currentLang = document.getElementById('lang-select').value;
@@ -1174,6 +1261,40 @@
             renderPatternLists();
         }
 
+        /* --- DRAG AND DROP ESEMÉNYKEZELŐK --- */
+        function onDragStart(e, index) {
+            draggedIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => {
+                e.target.classList.add('dragging');
+            }, 0);
+        }
+
+        function onDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.pattern-row-item').forEach(el => el.classList.remove('drag-over'));
+            draggedIndex = null;
+        }
+
+        function onDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const targetItem = e.target.closest('.pattern-row-item');
+            if (targetItem) {
+                document.querySelectorAll('.pattern-row-item').forEach(el => el.classList.remove('drag-over'));
+                targetItem.classList.add('drag-over');
+            }
+        }
+
+        function onDrop(e, targetIndex) {
+            e.preventDefault();
+            if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+            const movedItem = patternRows.splice(draggedIndex, 1)[0];
+            patternRows.splice(targetIndex, 0, movedItem);
+            renderPatternLists();
+        }
+
         /* Stopper */
         let timerInterval = null;
         let secondsElapsed = 0;
@@ -1190,7 +1311,6 @@
         function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
         function resetTimer() { stopTimer(); secondsElapsed = 0; document.getElementById('timer').innerText = "00:00"; }
 
-        /* Szemszám kalkulátor */
         function parseStitchesFromText(text) {
             if (!text) return 0;
             let explicitMatch = text.match(/\((\d+)\)\s*$/);
@@ -1268,6 +1388,7 @@
             patternRows = [];
             activePatternId = null;
             currentPhotoBase64 = "";
+            document.getElementById('design-pattern-name').value = '';
             document.getElementById('plush-name').value = '';
             document.getElementById('plush-colors').value = '';
             document.getElementById('hook-size').value = '';
@@ -1277,9 +1398,8 @@
             document.getElementById('project-status').value = 'planned';
             document.getElementById('project-deadline').value = '';
             document.getElementById('final-price').value = '7000';
-            document.getElementById('plush-photo-preview').style.display = 'none';
-            document.getElementById('plush-photo-input').value = '';
             
+            removePhoto();
             resetTimer();
             renderPatternLists();
             renderSavedSidebar();
@@ -1312,20 +1432,28 @@
 
                     if (item.type === 'header') {
                         workContainer.innerHTML += `<div class="pattern-row-item part-header"><span>🏷️ ${item.text}</span></div>`;
+                        
                         designContainer.innerHTML += `
-                            <div class="pattern-row-item part-header">
-                                <span>🏷️ ${item.text}</span>
-                                <div style="display: flex; gap: 6px;">
+                            <div class="pattern-row-item part-header" draggable="true" ondragstart="onDragStart(event, ${index})" ondragend="onDragEnd(event)" ondragover="onDragOver(event)" ondrop="onDrop(event, ${index})">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="drag-handle" title="Húzd az átrendezéshez">☰</span>
+                                    <span>🏷️ ${item.text}</span>
+                                </div>
+                                <div style="display: flex; gap: 6px; align-items: center;">
                                     <button class="btn-edit-solid" onclick="openEditModal(${index})">Módosítás</button>
                                     <button class="btn-danger-solid" onclick="deleteRow(${index})">Törlés</button>
                                 </div>
                             </div>`;
                     } else if (item.type === 'note') {
                         workContainer.innerHTML += `<div class="pattern-row-item note-item"><span>💡 ${item.text}</span></div>`;
+                        
                         designContainer.innerHTML += `
-                            <div class="pattern-row-item note-item">
-                                <span>💡 ${item.text}</span>
-                                <div style="display: flex; gap: 6px;">
+                            <div class="pattern-row-item note-item" draggable="true" ondragstart="onDragStart(event, ${index})" ondragend="onDragEnd(event)" ondragover="onDragOver(event)" ondrop="onDrop(event, ${index})">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="drag-handle" title="Húzd az átrendezéshez">☰</span>
+                                    <span>💡 ${item.text}</span>
+                                </div>
+                                <div style="display: flex; gap: 6px; align-items: center;">
                                     <button class="btn-edit-solid" onclick="openEditModal(${index})">Módosítás</button>
                                     <button class="btn-danger-solid" onclick="deleteRow(${index})">Törlés</button>
                                 </div>
@@ -1339,10 +1467,14 @@
                                 </label>
                             </div>
                         `;
+                        
                         designContainer.innerHTML += `
-                            <div class="pattern-row-item">
-                                <span>🧶 ${item.text} (${t.stDisplay(item.stitches)})</span>
-                                <div style="display: flex; gap: 6px;">
+                            <div class="pattern-row-item" draggable="true" ondragstart="onDragStart(event, ${index})" ondragend="onDragEnd(event)" ondragover="onDragOver(event)" ondrop="onDrop(event, ${index})">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="drag-handle" title="Húzd az átrendezéshez">☰</span>
+                                    <span>🧶 ${item.text} (${t.stDisplay(item.stitches)})</span>
+                                </div>
+                                <div style="display: flex; gap: 6px; align-items: center;">
                                     <button class="btn-edit-solid" onclick="openEditModal(${index})">Módosítás</button>
                                     <button class="btn-danger-solid" onclick="deleteRow(${index})">Törlés</button>
                                 </div>
@@ -1370,9 +1502,16 @@
                 currentPhotoBase64 = e.target.result;
                 const preview = document.getElementById('plush-photo-preview');
                 preview.src = currentPhotoBase64;
-                preview.style.display = 'block';
+                document.getElementById('photo-preview-box').style.display = 'block';
             }
             reader.readAsDataURL(file);
+        }
+
+        function removePhoto() {
+            currentPhotoBase64 = "";
+            document.getElementById('plush-photo-preview').src = "";
+            document.getElementById('photo-preview-box').style.display = 'none';
+            document.getElementById('plush-photo-input').value = "";
         }
 
         function saveDesignToSidebar() {
@@ -1416,7 +1555,10 @@
             if (item) {
                 activePatternId = item.id;
                 patternRows = JSON.parse(JSON.stringify(item.patternRows || []));
-                document.getElementById('plush-name').value = item.plushName || '';
+                
+                let name = item.plushName || '';
+                syncPatternName(name);
+
                 document.getElementById('plush-colors').value = item.plushColors || '';
                 document.getElementById('hook-size').value = item.hookSize || '';
                 document.getElementById('yarn-amount').value = item.yarnAmount || '';
@@ -1430,9 +1572,9 @@
                 const preview = document.getElementById('plush-photo-preview');
                 if(currentPhotoBase64) {
                     preview.src = currentPhotoBase64;
-                    preview.style.display = 'block';
+                    document.getElementById('photo-preview-box').style.display = 'block';
                 } else {
-                    preview.style.display = 'none';
+                    document.getElementById('photo-preview-box').style.display = 'none';
                 }
                 
                 renderPatternLists();
@@ -1441,7 +1583,7 @@
         }
 
         function deleteSavedPattern(event, id) {
-            event.stopPropagation(); // Ez állítja meg, hogy betöltődjön a minta törlés közben!
+            event.stopPropagation();
             if (confirm("Biztosan törölni szeretnéd ezt a projektet?")) {
                 savedPatterns = savedPatterns.filter(p => p.id !== id);
                 localStorage.setItem('pendlipop_patterns', JSON.stringify(savedPatterns));
@@ -1503,6 +1645,31 @@
         }
 
         function exportToPDF() { window.print(); }
+
+        async function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.name.endsWith('.pdf')) {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join('\n');
+                    fullText += pageText + '\n';
+                }
+                document.getElementById('import-text-area').value = fullText;
+            } else {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('import-text-area').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        }
+
         function importFromText() {
             const rawText = document.getElementById('import-text-area').value.trim();
             if (!rawText) return;
@@ -1515,7 +1682,9 @@
             renderPatternLists();
             closeImportModal();
         }
+
         function updateProductCard() {}
+
         function calculatePrice() {
             const hours = parseFloat(document.getElementById('time-spent-hours').value) || 0;
             const rate = parseFloat(document.getElementById('hourly-rate').value) || 0;
@@ -1523,6 +1692,7 @@
             const calc = (hours * rate) + material;
             document.getElementById('calculated-price').innerText = `${calc.toLocaleString('hu-HU')} Ft`;
         }
+
         function syncTimeFromTimer() {
             let h = (secondsElapsed / 3600).toFixed(1);
             document.getElementById('time-spent-hours').value = Math.max(0.5, h);
