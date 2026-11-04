@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pendlipöp Plüsseii - Horgolási Napló & Mintatervező</title>
@@ -1113,6 +1112,7 @@
         let activePatternId = null; 
         let currentPhotoBase64 = "";
         let draggedIndex = null;
+        let secondsElapsed = 0; // Stopper idő változó
 
         window.onload = function() {
             loadSavedPatternsFromStorage();
@@ -1298,19 +1298,23 @@
 
         /* Stopper */
         let timerInterval = null;
-        let secondsElapsed = 0;
+        
+        function updateTimerDisplay() {
+            let m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            let s = (secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+        }
+
         function startTimer() {
             if(!timerInterval) {
                 timerInterval = setInterval(() => {
                     secondsElapsed++;
-                    let m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-                    let s = (secondsElapsed % 60).toString().padStart(2, '0');
-                    document.getElementById('timer').innerText = `${m}:${s}`;
+                    updateTimerDisplay();
                 }, 1000);
             }
         }
         function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
-        function resetTimer() { stopTimer(); secondsElapsed = 0; document.getElementById('timer').innerText = "00:00"; }
+        function resetTimer() { stopTimer(); secondsElapsed = 0; updateTimerDisplay(); }
 
         function parseStitchesFromText(text) {
             if (!text) return 0;
@@ -1531,7 +1535,8 @@
                 deadline: document.getElementById('project-deadline').value,
                 photo: currentPhotoBase64,
                 finalPrice: document.getElementById('final-price').value,
-                patternRows: JSON.parse(JSON.stringify(patternRows))
+                secondsElapsed: secondsElapsed, // Elmentjük a stopper állását is!
+                patternRows: JSON.parse(JSON.stringify(patternRows)) // Elmentjük a sorokat és a pipákat is!
             };
 
             if (activePatternId) {
@@ -1557,6 +1562,11 @@
                 activePatternId = item.id;
                 patternRows = JSON.parse(JSON.stringify(item.patternRows || []));
                 
+                // Stopper idő visszaállítása
+                stopTimer();
+                secondsElapsed = item.secondsElapsed || 0;
+                updateTimerDisplay();
+
                 let name = item.plushName || '';
                 syncPatternName(name);
 
